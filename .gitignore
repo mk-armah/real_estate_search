@@ -1,2 +1,7 @@
+data
 venv
 .env
+data
+dynamo.py
+efiewura.json
+cleaned_data.xlsx

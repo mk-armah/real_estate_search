@@ -32,7 +32,7 @@ class ChromeSettings:
         chrome_prefs["profile.default_content_settings"] = {"images": 2}
         return chrome_options
 
-    def chef(self,url: str):
+    def chef(self,url: str,wait_condition):
         """
         Establishes connection with hyperlinks
         Args:       
@@ -45,14 +45,14 @@ class ChromeSettings:
         #driver = webdriver.Chrome(chrome_options  = self._set_chrome_options(),options = ChromeDriverManager().install())#    \
                   # if self.set_chrome_options is True else  webdriver.Chrome()       #
 
-        driver = webdriver.Chrome(ChromeDriverManager().install())
+        driver = webdriver.Chrome(chrome_options  = self._set_chrome_options(),options = ChromeDriverManager().install())
 
         # print(os.environ.get("SELENIUM_DRIVER_ENDPOINT"))
         
         # driver = Remote(
-        # command_executor ="http://selenium-hub:4444/wd/hub",  # os.environ.get("SELENIUM_DRIVER_ENDPOINT") ,#'http://selenium:4444/wd/hub',
+        # command_executor ="http://localhost:4444/wd/hub",  # os.environ.get("SELENIUM_DRIVER_ENDPOINT") ,#'http://selenium:4444/wd/hub',
         # desired_capabilities= {'browserName': 'chrome', 'javascriptEnabled': True,"enableVideo": True},
-        # options = self._set_chrome_options()
+        # # options = self._set_chrome_options()
         # )
 
         driver.get(url)
@@ -60,7 +60,9 @@ class ChromeSettings:
             WebDriverWait(
                 driver, 10).until( 
                 EC.presence_of_element_located(
-                    (By.ID, "JsEnable")))
+                    (By.ID, wait_condition)))
+
+            print("starting . .. .")
         except TimeoutException as timeout:
                 raise f"Spider wasn't fast enough | Connection Timed Out |{timeout}"
         except Exception as exec:

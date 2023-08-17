@@ -38,11 +38,12 @@ services:
 
   spider:
     build: .
+    container_name: spider
     depends_on:
       selenium-hub:
         condition : service_healthy
-      dynamodb:
-        condition : service_healthy
+      mongodb:
+        condition : service_started
 
     command: python spider.py
     networks: 
@@ -51,21 +52,34 @@ services:
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACESS_KEY: ${AWS_SECRET_ACESS_KEY}
 
-  dynamodb:
-    image: amazon/dynamodb-local
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
     ports:
-      - 8000:8000
+      - '27017:27017'
     volumes:
-      - ./data:/data
-    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath /data"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/shell"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
+      - ./mongodb_data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${DOCKER_MONGODB_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${DOCKER_MONGODB_PWD}
+
+
+  # dynamodb:
+  #   image: amazon/dynamodb-local
+  #   ports:
+  #     - 8000:8000
+  #   volumes:
+  #     - ./data:/data
+  #   command: "-jar DynamoDBLocal.jar -sharedDb -dbPath /data"
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:8000/shell"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 10
 
 networks:
   spider-network:
 
 volumes:
+  mongodb_data:
   store:
